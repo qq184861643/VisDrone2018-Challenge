@@ -22,3 +22,10 @@ A conclusion of partipating [ECCV 2018 workshop "Vision Meets Drone: A Challenge
 
 **6.** ddl的前半个小时才发现测试图片没有标注会导致测试代码运行不了，手忙脚乱的补假标注然后测试然后提交，搞完都超出ddl半个多小时了，还好侥幸提交上了不然两个月的成mo果yu一下付诸东流。。。实际上在调参过程中也发生过类似的事，有几组参数跑完没有详细记录后来自己忘了效果怎么样了，又得重新跑一次。我还是在比赛过程中太懈怠了，对于这种ddl要求明确的任务，还是务必得规划好时间，做好记录，提前一些时间就得把每个环节都试运行一遍看看是否有问题，以防临到头了又出问题。<br>
 **6.** because I don't plan a explicit schedule at the first place and rehearse all the stages along to submitting the results ahead of deadline, I came across many unexpected problems and almost miss the submitting deadling, which taught me a very heavy lesson.
+
+_____________________________________________________________________________________________________________________
+最近重新写了一遍代码，包括Faster Rcnn和RetinaNetwork都写了一遍。刚好面试的时候被问到检测任务中one stage和two stage分别有什么局限性，现在慢慢把想到的记在这里。
+**1.** one stage的方法是在最后检测和分类做完了之后再做nms，所以可以很方便的做分类nms，这样可以避免不同类物体重叠程度较高时nms抑制掉其中一类物体；而two stage方法时在RPN提出proposal时就会做一次nms，不好做分类nms，我目前能想到的办法是放高RPN的nms阈值使得第一阶段出来的proposal变多一点，第二阶段分类和回归完成之后再做一次阈值较低的分类nms，但是这样无疑会加剧two stage计算速度慢的问题。
+
+**2.** 但是反过来说，由于two stage方法对bbox先做了一次筛选，首先soft-nms对于交叠程度较高的bbox降低置信度时不会直接降低分类置信度只会降低proposal置信度，其次进入第二步的bbox都是可靠性比较高的，这样第二步之后对于置信度筛选的阈值可以设置得比较低，就不会漏过分类置信度不高但是分类正确的样本。但是对于one stage方法，选定最后的nms阈值和置信度阈值本身就是一个比较慎重的事，其次soft-nms降低置信度时会直接降低分类置信度，进一步加剧了选择置信度的困难程度。
+
